@@ -1,0 +1,8 @@
+TRAIN = ../datasets/benchmark/korns-1-train.data
+TEST = ../datasets/benchmark/korns-1-test.data
+OPERATORS = +,-,*,/
+ITERATIONS = 2000
+TOURNAMENT = 10
+POPULATION = 1000
+HEIGHT = 6
+MUTATION_RATE = 0.5
