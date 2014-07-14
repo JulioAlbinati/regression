@@ -1,0 +1,8 @@
+TRAIN = ../datasets/dengue/angra-dos-reis-train.data
+TEST = ../datasets/dengue/angra-dos-reis-test.data
+OPERATORS = +,-,*,/
+TOURNAMENT = 7
+ITERATIONS = 100
+POPULATION = 1000
+MUTATION_RATE = 0.5
+MUTATION_STEP = 1
