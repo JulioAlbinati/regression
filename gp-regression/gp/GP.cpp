@@ -111,7 +111,7 @@ std::vector<unsigned int> GP::selection(unsigned int num, const Dataset& train)
 		for (unsigned int j = 0; j < tour_size; ++j)
 		{
 			unsigned int index = rand() % fitness.size();
-			if (fitness[index] < fitness[best])
+			if (fitness[index] > fitness[best])
 				best = index;
 		}
 		selected.push_back(best);

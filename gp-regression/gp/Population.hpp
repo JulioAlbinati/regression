@@ -40,7 +40,7 @@ public:
 		unsigned int best_index = 0;
 		for (unsigned int i = 1; i < fitness.size(); ++i)
 		{
-			if (fitness[best_index] > fitness[i])
+			if (fitness[best_index] < fitness[i])
 				best_index = i;
 		}
 		return std::pair<unsigned int, double>(best_index, fitness[best_index]);
