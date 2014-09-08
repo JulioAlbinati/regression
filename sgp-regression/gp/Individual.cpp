@@ -67,8 +67,10 @@ Individual::Individual(const std::string& operation, const Individual& left, con
 }
 
 Individual Individual::build_random_individual(unsigned int max_height, bool full, unsigned int num_terminals, 
-	const std::vector<std::string>& operators, const Dataset& train, const Dataset& test)
+	const std::vector<std::string>& operators, std::vector<std::mt19937>& generators, const Dataset& train, const Dataset& test)
 {
+	std::uniform_real_distribution<double> dist_non_neg(0.0, 1.0);
+	std::uniform_real_distribution<double> dist_pos_neg(-1.0, 1.0);
 	std::vector< std::vector< std::pair<unsigned int, short> > > tree_matrix;
 	if (full)
 	{
@@ -79,7 +81,7 @@ Individual Individual::build_random_individual(unsigned int max_height, bool ful
 			tree_matrix.push_back(std::vector<std::pair<unsigned int, short> >());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
-				unsigned int index = rand() % operators.size();
+				unsigned int index = generators[omp_get_thread_num()]() % operators.size();
 				tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 0));
 			}
 			nodes_level *= 2;
@@ -88,10 +90,10 @@ Individual Individual::build_random_individual(unsigned int max_height, bool ful
 		tree_matrix.push_back(std::vector<std::pair<unsigned int, short> >());
 		for (unsigned int i = 0; i < nodes_level; ++i)
 		{
-			double coin = ((double) rand()) / RAND_MAX;
+			double coin = dist_non_neg(generators[omp_get_thread_num()]);
 			if (coin < 0.5)
 			{
-				unsigned int index = rand() % num_terminals;
+				unsigned int index = generators[omp_get_thread_num()]() % num_terminals;
 				tree_matrix[max_height - 1].push_back(std::pair<unsigned int, short>(index, 1));
 			}
 			else
@@ -107,19 +109,19 @@ Individual Individual::build_random_individual(unsigned int max_height, bool ful
 			tree_matrix.push_back(std::vector<std::pair<unsigned int, short> >());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
-				double coin = ((double) rand()) / RAND_MAX;
+				double coin = dist_non_neg(generators[omp_get_thread_num()]);
 				if (coin < 0.9 && i < max_height - 1)
 				{
-					unsigned int index = rand() % operators.size();
+					unsigned int index = generators[omp_get_thread_num()]() % operators.size();
 					tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 0));
 					next_level += 2;
 				}
 				else
 				{
-					coin = ((double) rand()) / RAND_MAX;
+					coin = dist_non_neg(generators[omp_get_thread_num()]);
 					if (coin < 0.5)
 					{
-						unsigned int index = rand() % num_terminals;
+						unsigned int index = generators[omp_get_thread_num()]() % num_terminals;
 						tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 1));
 					}
 					else
@@ -146,7 +148,7 @@ Individual Individual::build_random_individual(unsigned int max_height, bool ful
 				new_roots.push_back(Individual(tree_matrix[i][j].first, train, test));
 			else
 			{
-				double value = ((double) rand()) / (RAND_MAX / 2) - 1.0;
+				double value = dist_pos_neg(generators[omp_get_thread_num()]);
 				new_roots.push_back(Individual(value, train, test));
 			}
 		}

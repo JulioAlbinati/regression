@@ -6,12 +6,16 @@
 
 const std::vector<Statistics>& Population::evaluate(const Dataset& dataset, bool use_train)
 {
+	std::vector<Statistics> temp;
+	temp.resize(solutions.size());
+
 	if (use_train && previous_train_fitness.size() > 0)
 		return previous_train_fitness;
 	else if (!use_train && previous_test_fitness.size() > 0)
 		return previous_test_fitness;
 	else
 	{
+		//#pragma omp parallel for
 		for (unsigned int i = 0; i < solutions.size(); ++i)
 		{
 			std::vector<double> fitted;
@@ -43,15 +47,18 @@ const std::vector<Statistics>& Population::evaluate(const Dataset& dataset, bool
 				stats.total_error = std::numeric_limits<double>::max();
 				stats.hits = 0.0;
 			}
-			if (use_train)
-				previous_train_fitness.push_back(stats);
-			else
-				previous_test_fitness.push_back(stats);
+			temp[i] = stats;
 		}
 
 		if (use_train)
+		{
+			previous_train_fitness = temp;
 			return previous_train_fitness;
+		}
 		else
+		{
+			previous_test_fitness = temp;
 			return previous_test_fitness;
+		}
 	}
 }
