@@ -11,9 +11,10 @@ class SGP
 {
 public:
 	inline SGP(unsigned int pop_size, unsigned int num_iter, unsigned int max_height, unsigned int mut_height, unsigned int tour_size, 
-		  double mut_rate, double mut_step, short mode_init, unsigned int num_terminals, const std::vector<std::string>& operators) : 
-		  pop_size(pop_size), num_iter(num_iter), max_height(max_height), mut_height(mut_height), tour_size(tour_size), mut_rate(mut_rate), 
-		  mut_step(mut_step), mode_init(mode_init), num_terminals(num_terminals), operators(operators)
+		  unsigned int seed, double mut_rate, double mut_step, short mode_init, unsigned int num_terminals, 
+		  const std::vector<std::string>& operators) : pop_size(pop_size), num_iter(num_iter), max_height(max_height), mut_height(mut_height), 
+		  tour_size(tour_size), seed(seed), mut_rate(mut_rate), mut_step(mut_step), mode_init(mode_init), 
+		  num_terminals(num_terminals), operators(operators)
 	{
 		cur_pop = new Population();
 	}
@@ -26,7 +27,10 @@ public:
 
 	inline virtual void run(const Dataset& train, const Dataset& test)
 	{
-		srand(time(NULL));
+		unsigned int num_threads = omp_get_max_threads();
+		for (unsigned int i = 0; i < num_threads; ++i)
+			generators.push_back(std::mt19937(seed + i));
+
 		initialize_pop(train, test);
 		
 		std::pair<unsigned int, double> best_at_train;
@@ -53,11 +57,12 @@ public:
 	}
 
 protected:
-	unsigned int pop_size, num_iter, max_height, mut_height, tour_size;
+	unsigned int pop_size, num_iter, max_height, mut_height, tour_size, seed;
 	double mut_rate, mut_step;
 	short mode_init;
 	unsigned int num_terminals;
 	std::vector<std::string> operators;
+	std::vector<std::mt19937> generators;
 	Population* cur_pop;
 
 	virtual void iteration(const Dataset& train, const Dataset& test);

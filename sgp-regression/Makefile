@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -g --std=c++0x -O3
+CFLAGS=-Wall -Wextra -g --std=c++0x -O3 -fopenmp
 
 all: sgp sigmoid-cross opt-cross opt-linear
 

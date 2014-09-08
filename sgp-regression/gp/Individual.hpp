@@ -3,6 +3,8 @@
 #define INDIVIDUAL
 
 #include <cmath>
+#include <random>
+#include <omp.h>
 
 #include "../data/Dataset.hpp"
 
@@ -47,7 +49,7 @@ public:
 	inline const std::vector<double>& fitted_test() const { return test_values; }
 
 	static Individual build_random_individual(unsigned int max_height, bool full, unsigned int num_terminals, 
-		const std::vector<std::string>& operators, const Dataset& train, const Dataset& test);
+		const std::vector<std::string>& operators, std::vector<std::mt19937>& generators, const Dataset& train, const Dataset& test);
 
 private:
 	std::vector<double> train_values;
