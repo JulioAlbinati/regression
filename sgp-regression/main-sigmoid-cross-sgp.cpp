@@ -26,8 +26,8 @@ int main(int argc, char* argv[])
 
 	unsigned int num_terminals = train->num_attrs();
 	std::cout << "terminals " << num_terminals << std::endl;
-	CrossSigmoidSGP gp(param.pop_size, param.num_iter, param.max_height, param.mut_height, param.tour_size, param.mut_rate, param.mut_step, param.mode_init, 
-		num_terminals, param.operators);
+	CrossSigmoidSGP gp(param.pop_size, param.num_iter, param.max_height, param.mut_height, param.tour_size, param.seed, param.mut_rate, 
+		param.mut_step, param.mode_init, num_terminals, param.operators);
 	cerr << "----- PARAMETERS USED -----" << endl;
 	param.print_parameters(cerr);
 

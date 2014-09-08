@@ -25,8 +25,8 @@ int main(int argc, char* argv[])
 	Dataset* test = read_data_file(param.test_file);
 
 	unsigned int num_terminals = train->num_attrs();
-	OptimizedCrossLinearSGP gp(param.pop_size, param.num_iter, param.max_height, param.mut_height, param.tour_size, param.mut_rate, param.mut_step, param.mode_init, 
-		num_terminals, param.operators);
+	OptimizedCrossLinearSGP gp(param.pop_size, param.num_iter, param.max_height, param.mut_height, param.tour_size, param.seed, 
+		param.mut_rate, param.mut_step, param.mode_init, num_terminals, param.operators);
 	cerr << "----- PARAMETERS USED -----" << endl;
 	param.print_parameters(cerr);
 
