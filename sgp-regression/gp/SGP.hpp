@@ -27,9 +27,13 @@ public:
 
 	inline virtual void run(const Dataset& train, const Dataset& test)
 	{
+		mut_step *= train.get_std_dev();
+		std::cout << mut_step << std::endl;
+
 		unsigned int num_threads = omp_get_max_threads();
+		generators.push_back(std::mt19937(seed));
 		for (unsigned int i = 0; i < num_threads; ++i)
-			generators.push_back(std::mt19937(seed + i));
+			generators.push_back(std::mt19937(generators[0]()));
 
 		initialize_pop(train, test);
 		

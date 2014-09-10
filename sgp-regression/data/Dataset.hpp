@@ -4,6 +4,7 @@
 
 #include <vector>
 #include <cassert>
+#include <cmath>
 
 #include "Instance.hpp"
 
@@ -30,6 +31,20 @@ public:
 		dataset.push_back(instance);
 		if (instance->size() > size_attrs)
 			size_attrs = instance->size();
+	}
+
+	inline double get_std_dev() const
+	{
+		double mean = 0.0;
+		for (unsigned int i = 0; i < dataset.size(); ++i)
+			mean += dataset[i]->target;
+		mean /= dataset.size();
+
+		double variance = 0.0;
+		for (unsigned int i = 0; i < dataset.size(); ++i)
+			variance += pow(dataset[i]->target - mean, 2);
+		variance /= dataset.size();
+		return sqrt(variance);
 	}
 
 	inline unsigned int num_attrs() const { return size_attrs; }
