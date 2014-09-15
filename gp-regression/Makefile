@@ -14,7 +14,5 @@ std-gp: framework
 	g++ ${CFLAGS} -c main-std-gp.cpp -o main-std-gp.o
 	g++ ${CFLAGS} data/Dataset.o graph/Digraph.o gp/Parameters.o gp/Individual.o gp/Population.o gp/GP.o main-std-gp.o -o std-gp
 
-sgp: framework
-	g++ ${CFLAGS} -c gp/SemanticGP.cpp -o gp/SemanticGP.o
-	g++ ${CFLAGS} -c main-sgp.cpp -o main-sgp.o
-	g++ ${CFLAGS} data/Dataset.o graph/Digraph.o gp/Parameters.o gp/Individual.o gp/Population.o gp/GP.o gp/SemanticGP.o main-sgp.o -o sgp
+clean:
+	rm *.o data/*.o graph/*.o gp/*.o std-gp
