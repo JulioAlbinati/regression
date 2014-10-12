@@ -10,31 +10,19 @@ const std::vector<double>& Population::evaluate(const Dataset& dataset, unsigned
 		return it->second;
 	else
 	{
-		double mean_real = 0.0;
-		for (unsigned int i = 0; i < dataset.size(); ++i)
-			mean_real += (dataset[i].target / ((double) dataset.size()));
-
 		previous_fitness[dataset_id] = std::vector<double>();
 		for (unsigned int i = 0; i < solutions.size(); ++i)
 		{
 			std::vector<double> fitted = solutions[i]->evaluate(dataset, dataset_id);
-			double mean_fitted = 0.0;
+			double sse = 0.0;
 			for (unsigned int j = 0; j < dataset.size() && j < fitted.size(); ++j)
-				mean_fitted += (fitted[j] / ((double) fitted.size()));
+				sse += pow(fitted[j] - dataset[j].target, 2);
+			double rmse = sqrt(sse / dataset.size());
 
-
-			double numerator = 0.0, dev_real = 0.0, dev_fitted = 0.0;
-			for (unsigned int j = 0; j < dataset.size() && j < fitted.size(); ++j)
-			{
-				numerator += (dataset[j].target - mean_real) * (fitted[j] - mean_fitted);
-				dev_real += pow(dataset[j].target - mean_real, 2);
-				dev_fitted += pow(fitted[j] - mean_fitted, 2);
-			}
-			double r = numerator / (sqrt(dev_real * dev_fitted));
-			if (std::isfinite(r))
-				previous_fitness[dataset_id].push_back(r);
+			if (std::isfinite(rmse))
+				previous_fitness[dataset_id].push_back(rmse);
 			else
-				previous_fitness[dataset_id].push_back(0);
+				previous_fitness[dataset_id].push_back(std::numeric_limits<double>::max());
 		}
 
 		return previous_fitness[dataset_id];

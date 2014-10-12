@@ -3,6 +3,8 @@
 #define GP_CLASS
 
 #include <iostream>
+#include <random>
+#include <omp.h>
 
 #include "Population.hpp"
 
@@ -20,7 +22,11 @@ public:
 
 	inline virtual std::string run(const Dataset& train, const Dataset& test)
 	{
-		srand(time(NULL));
+		unsigned int num_threads = omp_get_max_threads();
+		generators.push_back(std::mt19937(1));
+		for (unsigned int i = 0; i < num_threads; ++i)
+			generators.push_back(std::mt19937(generators[0]()));
+
 		Digraph graph;
 		initialize_pop(graph);
 
@@ -55,6 +61,7 @@ protected:
 	double mut_rate;
 	short mode_init;
 	std::vector<std::string> terminals, operators;
+	std::vector<std::mt19937> generators;
 	Population* cur_pop;
 
 	virtual void iteration(const Dataset& train, Digraph& graph);

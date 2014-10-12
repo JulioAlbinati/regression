@@ -7,6 +7,7 @@
 #include <climits>
 #include <sstream>
 #include <iostream>
+#include <omp.h>
 
 #include "Vertex.hpp"
 #include "../data/Dataset.hpp"
@@ -51,6 +52,7 @@ public:
 
 	inline unsigned int exists(std::string operation, unsigned int left, unsigned int right) const
 	{
+		unsigned int ret = UINT_MAX;
 		for (unsigned int i = 0; i < vertices.size(); ++i)
 		{
 			if (!vertices[i]->is_terminal())
@@ -60,12 +62,14 @@ public:
 				{
 					if (((operation == "+" || operation == "*") && adj_lists[i].first == right && adj_lists[i].second == left) ||
 					    (adj_lists[i].first == left && adj_lists[i].second == right))
-						return i;
+					{
+						ret = i;
+						break;
+					}
 				}
 			}
 		}
-
-		return UINT_MAX;
+		return ret;
 	}
 
 	inline unsigned int exists(std::string variable) const

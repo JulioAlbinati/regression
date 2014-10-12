@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Wextra -O3 -g --std=c++0x
+CFLAGS=-Wall -Wextra -O3 -g --std=c++0x -fopenmp
 
 all: std-gp sgp
 

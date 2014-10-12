@@ -22,8 +22,10 @@ Individual::Individual (unsigned int index_left, std::string operation, unsigned
 }
 
 unsigned int Individual::prune(unsigned int index_vertex, unsigned int max_height, Digraph& digraph, const std::vector<std::string> terminals, 
-	std::vector<double>& values, unsigned int& cur_index)
+	std::vector<double>& values, unsigned int& cur_index, std::mt19937& generator)
 {
+	std::uniform_real_distribution<double> dist_non_neg(0.0, 1.0);
+	std::uniform_real_distribution<double> dist_pos_neg(-1.0, 1.0);
 	Vertex* v = digraph.vertex(index_vertex);
 	if (max_height == 0)
 	{
@@ -39,17 +41,17 @@ unsigned int Individual::prune(unsigned int index_vertex, unsigned int max_heigh
 				++it_end;
 			values.erase(it_begin, it_end);
 
-			double coin = ((double) rand()) / RAND_MAX;
+			double coin = dist_non_neg(generator);
 			if (coin < 0.5)
 			{
-				unsigned int index = rand() % terminals.size();
+				unsigned int index = generator() % terminals.size();
 				index_vertex = digraph.exists(terminals[index]);
 				if (index_vertex == UINT_MAX)
 					index_vertex = digraph.add_vertex(new VariableVertex(terminals[index]));
 			}
 			else
 			{
-				double value = (((double) rand() - RAND_MAX / 2) / RAND_MAX) * 200;
+				double value = dist_pos_neg(generator);
 				index_vertex = 0;
 				values.push_back(value);
 				++cur_index;
@@ -62,8 +64,8 @@ unsigned int Individual::prune(unsigned int index_vertex, unsigned int max_heigh
 		if (!v->is_terminal())
 		{
 			std::pair<unsigned int, unsigned int> neighbors = digraph.neighbors(index_vertex);
-			unsigned int left = prune(neighbors.first, max_height - 1, digraph, terminals, values, cur_index);
-			unsigned int right = prune(neighbors.second, max_height - 1, digraph, terminals, values, cur_index);
+			unsigned int left = prune(neighbors.first, max_height - 1, digraph, terminals, values, cur_index, generator);
+			unsigned int right = prune(neighbors.second, max_height - 1, digraph, terminals, values, cur_index, generator);
 			if (left != neighbors.first || right != neighbors.second)
 			{
 				IntermediateVertex* inter = (IntermediateVertex*) v;
@@ -85,9 +87,9 @@ unsigned int Individual::prune(unsigned int index_vertex, unsigned int max_heigh
 	}
 }
 
-Individual* Individual::random_subexpression()
+Individual* Individual::random_subexpression(std::mt19937& generator)
 {
-	unsigned int chosen = rand() % digraph->size(index_vertex);
+	unsigned int chosen = generator() % digraph->size(index_vertex);
 	return random_subexpression(chosen);
 }
 
@@ -122,8 +124,10 @@ Individual* Individual::random_subexpression(unsigned int chosen)
 }
 
 Individual* Individual::build_random_individual(unsigned int max_height, bool full, const std::vector<std::string>& terminals, 
-	const std::vector<std::string>& operators, Digraph& graph)
+	const std::vector<std::string>& operators, Digraph& graph, std::mt19937& generator)
 {
+	std::uniform_real_distribution<double> dist_non_neg(0.0, 1.0);
+	std::uniform_real_distribution<double> dist_pos_neg(-1.0, 1.0);
 	std::vector< std::vector<std::string> > tree_matrix;
 	if (full)
 	{
@@ -134,7 +138,7 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 			tree_matrix.push_back(std::vector<std::string>());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
-				unsigned int index = rand() % operators.size();
+				unsigned int index = generator() % operators.size();
 				tree_matrix[i].push_back(operators[index]);
 			}
 			nodes_level *= 2;
@@ -143,15 +147,15 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 		tree_matrix.push_back(std::vector<std::string>());
 		for (unsigned int i = 0; i < nodes_level; ++i)
 		{
-			double coin = ((double) rand()) / RAND_MAX;
+			double coin = dist_non_neg(generator);
 			if (coin < 0.5)
 			{
-				unsigned int index = rand() % terminals.size();
+				unsigned int index = generator() % terminals.size();
 				tree_matrix[max_height - 1].push_back(terminals[index]);
 			}
 			else
 			{
-				double value = (((double) rand() - RAND_MAX / 2) / RAND_MAX) * 200;
+				double value = dist_pos_neg(generator);
 				std::stringstream ss;
 				ss << value;
 				tree_matrix[max_height - 1].push_back(ss.str());
@@ -167,24 +171,23 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 			tree_matrix.push_back(std::vector<std::string>());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
-				double coin = ((double) rand()) / RAND_MAX;
+				double coin = dist_non_neg(generator);
 				if (coin < 0.9 && i < max_height - 1)
 				{
-					unsigned int index = rand() % operators.size();
+					unsigned int index = generator() % operators.size();
 					tree_matrix[i].push_back(operators[index]);
 					next_level += 2;
 				}
 				else
 				{
-					coin = ((double) rand()) / RAND_MAX;
-					if (coin < 0.5)
+					if (coin < 0.45)
 					{
-						unsigned int index = rand() % terminals.size();
+						unsigned int index = generator() % terminals.size();
 						tree_matrix[i].push_back(terminals[index]);
 					}
 					else
 					{
-						double value = (((double) rand() - RAND_MAX / 2) / RAND_MAX) * 200;
+						double value = dist_pos_neg(generator);
 						std::stringstream ss;
 						ss << value;
 						tree_matrix[i].push_back(ss.str());

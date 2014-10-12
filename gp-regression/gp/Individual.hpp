@@ -3,6 +3,7 @@
 #define INDIVIDUAL
 
 #include <iostream>
+#include <random>
 
 #include "../graph/Digraph.hpp"
 
@@ -33,7 +34,7 @@ public:
 		return digraph->evaluate(index_vertex, dataset, dataset_id, values, count);
 	}
 
-	Individual* random_subexpression();
+	Individual* random_subexpression(std::mt19937& generator);
 
 	inline unsigned int size() const { return digraph->size(index_vertex); }
 
@@ -67,10 +68,10 @@ public:
 	}
 
 	static Individual* build_random_individual(unsigned int max_height, bool full, const std::vector<std::string>& terminals, 
-		const std::vector<std::string>& operators, Digraph& graph);
+		const std::vector<std::string>& operators, Digraph& graph, std::mt19937& generator);
 
 	static unsigned int prune(unsigned int index_vertex, unsigned int max_height, Digraph& digraph, const std::vector<std::string> terminals, 
-		std::vector<double>& values, unsigned int& cur_index);
+		std::vector<double>& values, unsigned int& cur_index, std::mt19937& generator);
 
 private:
 	unsigned int index_vertex;
