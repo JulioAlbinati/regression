@@ -20,7 +20,6 @@ public:
 		vertices.push_back(new ConstantVertex());
 		vertices[0]->increase_ref_count();
 		adj_lists.push_back(std::pair<unsigned int, unsigned int>(UINT_MAX, UINT_MAX));
-		previous_results.push_back(std::map< unsigned int, std::vector<double> >());
 	}
 
 	inline virtual ~Digraph()
@@ -37,7 +36,6 @@ public:
 	{
 		vertices.push_back(vertex);
 		adj_lists.push_back(std::pair<unsigned int, unsigned int>(UINT_MAX, UINT_MAX));
-		previous_results.push_back(std::map< unsigned int, std::vector<double> >());
 		return vertices.size() - 1;
 	}
 
@@ -47,8 +45,8 @@ public:
 			adj_lists[from] = std::pair<unsigned int, unsigned int>(left, right);
 	}
 
-	const std::vector<double> evaluate(unsigned int index, const Dataset& dataset, unsigned int dataset_id, const std::vector<double>& values, 
-		unsigned int& cur_index);
+	std::vector<double> evaluate(unsigned int index, const Dataset& dataset, const std::vector<double>& values, 
+		unsigned int& cur_index) const;
 
 	inline unsigned int exists(std::string operation, unsigned int left, unsigned int right) const
 	{
@@ -192,7 +190,6 @@ public:
 private:
 	std::vector<Vertex*> vertices;
 	std::vector< std::pair<unsigned int, unsigned int> > adj_lists;
-	std::vector< std::map< unsigned int, std::vector<double> > > previous_results;
 };
 
 #endif

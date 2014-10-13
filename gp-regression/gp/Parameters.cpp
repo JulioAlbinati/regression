@@ -43,6 +43,8 @@ void Parameters::read_param_file(std::string filename)
 				max_height = atoi(param_value.data());
 			else if (param_name == "order")
 				max_order = atoi(param_value.data());
+			else if (param_name == "seed")
+				seed = atoi(param_value.data());
 			else if (param_name == "mutation_rate")
 				mut_rate = atof(param_value.data());
 			else if (param_name == "mutation_step")
@@ -92,6 +94,7 @@ void Parameters::print_parameters(std::ostream& os)
 		os << "Grow" << std::endl;
 	os << "Maximum height of new trees: " << max_height << std::endl;
 	os << "Maximum order of new trees: " << max_order << std::endl;
+	os << "Seed: " << seed << std::endl;
 	os << "Mutation rate: " << mut_rate << std::endl;
 	os << "Mutation step: " << mut_step << std::endl;
 	os << "Error allowed: " << error << std::endl;

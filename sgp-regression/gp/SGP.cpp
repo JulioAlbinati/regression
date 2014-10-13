@@ -52,23 +52,10 @@ void SGP::initialize_pop(const Dataset& train, const Dataset& test)
 		num_grow = pop_size - num_full;
 	}
 
-
-	std::vector<Individual*> temp;
-	temp.resize(pop_size);
-	#pragma omp parallel
-	{
-		#pragma omp for
-		for (unsigned int i = 0; i < num_full; ++i)
-			temp[i] = new Individual(Individual::build_random_individual(max_height, true, num_terminals, operators, generators, train, test));
-	}
-	#pragma omp parallel
-	{
-		#pragma omp for
-		for (unsigned int i = 0; i < num_grow; ++i)
-			temp[i + num_full] = new Individual(Individual::build_random_individual(max_height, false, num_terminals, operators, generators, train, test));
-	}
-	for (unsigned int i = 0; i < pop_size; ++i)
-		cur_pop->add_solution(temp[i]);
+	for (unsigned int i = 0; i < num_full; ++i)
+		cur_pop->add_solution(new Individual(Individual::build_random_individual(max_height, true, num_terminals, operators, generators, train, test)));
+	for (unsigned int i = 0; i < num_grow; ++i)
+		cur_pop->add_solution(new Individual(Individual::build_random_individual(max_height, false, num_terminals, operators, generators, train, test)));
 }
 
 std::vector<unsigned int> SGP::selection(unsigned int num, const Dataset& train)

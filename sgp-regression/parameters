@@ -1,9 +1,9 @@
-TRAIN = ../datasets/benchmark/korns-2-modified-train.data
-TEST = ../datasets/benchmark/korns-2-modified-test.data
-OPERATORS = +,-,*,/
+TRAIN = ../datasets/dengue/angra-dos-reis.data
+OPERATORS = +,-,*,
 TOURNAMENT = 2
-ITERATIONS = 10
-POPULATION = 10
+ITERATIONS = 0
+POPULATION = 5
 MUTATION_RATE = 0.5
 MUTATION_STEP = 0.01
 SEED = 1
+HEIGHT = 5

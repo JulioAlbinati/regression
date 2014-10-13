@@ -1,6 +1,6 @@
-CFLAGS=-Wall -Wextra -O3 -g --std=c++0x -fopenmp
+CFLAGS=-Wall -Wextra -O3 -g --std=c++0x
 
-all: std-gp sgp
+all: std-gp
 
 framework:
 	g++ ${CFLAGS} -c data/Dataset.cpp -o data/Dataset.o

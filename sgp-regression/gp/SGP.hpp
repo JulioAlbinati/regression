@@ -28,14 +28,13 @@ public:
 	inline virtual void run(const Dataset& train, const Dataset& test)
 	{
 		mut_step *= train.get_std_dev();
-		std::cout << mut_step << std::endl;
+
+		generators.push_back(std::mt19937(seed));
+		initialize_pop(train, test);
 
 		unsigned int num_threads = omp_get_max_threads();
-		generators.push_back(std::mt19937(seed));
 		for (unsigned int i = 0; i < num_threads; ++i)
 			generators.push_back(std::mt19937(generators[0]()));
-
-		initialize_pop(train, test);
 		
 		std::pair<unsigned int, double> best_at_train;
 		for (unsigned int i = 0; i < num_iter; ++i)
@@ -58,6 +57,11 @@ public:
 
 			std::cout << "Size: " << (*cur_pop)[best_at_train.first].size() << std::endl;
 		}
+			best_at_train = cur_pop->best(train);
+			std::vector<Statistics> fitness_train = cur_pop->evaluate(train);
+			std::cout << "RMSE (train): " << fitness_train[best_at_train.first].rmse << std::endl;
+			std::vector<Statistics> fitness_test = cur_pop->evaluate(test, false);
+			std::cout << "RMSE (test): " << fitness_test[best_at_train.first].rmse << std::endl;
 	}
 
 protected:

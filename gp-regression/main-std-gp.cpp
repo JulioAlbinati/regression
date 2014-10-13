@@ -25,7 +25,7 @@ int main(int argc, char* argv[])
 	Dataset* test = read_data_file(param.test_file);
 
 	vector<string> terminals = train->names();
-	GP gp(param.pop_size, param.num_iter, param.max_height, param.tour_size, param.mut_rate, param.mode_init, terminals, param.operators);
+	GP gp(param.pop_size, param.num_iter, param.max_height, param.tour_size, param.seed, param.mut_rate, param.mode_init, terminals, param.operators);
 	cerr << "----- PARAMETERS USED -----" << endl;
 	param.print_parameters(cerr);
 

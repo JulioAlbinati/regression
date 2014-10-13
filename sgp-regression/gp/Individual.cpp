@@ -91,7 +91,7 @@ Individual Individual::build_random_individual(unsigned int max_height, bool ful
 		for (unsigned int i = 0; i < nodes_level; ++i)
 		{
 			double coin = dist_non_neg(generators[omp_get_thread_num()]);
-			if (coin < 0.5)
+			if (coin < 2)
 			{
 				unsigned int index = generators[omp_get_thread_num()]() % num_terminals;
 				tree_matrix[max_height - 1].push_back(std::pair<unsigned int, short>(index, 1));

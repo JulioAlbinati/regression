@@ -128,38 +128,33 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 {
 	std::uniform_real_distribution<double> dist_non_neg(0.0, 1.0);
 	std::uniform_real_distribution<double> dist_pos_neg(-1.0, 1.0);
-	std::vector< std::vector<std::string> > tree_matrix;
+	std::vector< std::vector< std::pair<unsigned int, short> > > tree_matrix;
 	if (full)
 	{
 		unsigned int nodes_level = 1;
 		// Generating only operators...
 		for (unsigned int i = 0; i < max_height - 1; ++i)
 		{
-			tree_matrix.push_back(std::vector<std::string>());
+			tree_matrix.push_back(std::vector< std::pair<unsigned int, short> >());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
 				unsigned int index = generator() % operators.size();
-				tree_matrix[i].push_back(operators[index]);
+				tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 0));
 			}
 			nodes_level *= 2;
 		}
 		// Generating terminal nodes...
-		tree_matrix.push_back(std::vector<std::string>());
+		tree_matrix.push_back(std::vector< std::pair<unsigned int, short> >());
 		for (unsigned int i = 0; i < nodes_level; ++i)
 		{
 			double coin = dist_non_neg(generator);
-			if (coin < 0.5)
+			if (coin < 2)
 			{
 				unsigned int index = generator() % terminals.size();
-				tree_matrix[max_height - 1].push_back(terminals[index]);
+				tree_matrix[max_height - 1].push_back(std::pair<unsigned int, short>(index, 1));
 			}
 			else
-			{
-				double value = dist_pos_neg(generator);
-				std::stringstream ss;
-				ss << value;
-				tree_matrix[max_height - 1].push_back(ss.str());
-			}
+				tree_matrix[max_height - 1].push_back(std::pair<unsigned int, short>(0, 2));
 		}
 	}
 	else
@@ -168,30 +163,26 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 		for (unsigned int i = 0; i < max_height; ++i)
 		{
 			unsigned int next_level = 0;
-			tree_matrix.push_back(std::vector<std::string>());
+			tree_matrix.push_back(std::vector< std::pair<unsigned int, short> >());
 			for (unsigned int j = 0; j < nodes_level; ++j)
 			{
 				double coin = dist_non_neg(generator);
 				if (coin < 0.9 && i < max_height - 1)
 				{
 					unsigned int index = generator() % operators.size();
-					tree_matrix[i].push_back(operators[index]);
+					tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 0));
 					next_level += 2;
 				}
 				else
 				{
-					if (coin < 0.45)
+					coin = dist_non_neg(generator);
+					if (coin < 0.5)
 					{
 						unsigned int index = generator() % terminals.size();
-						tree_matrix[i].push_back(terminals[index]);
+						tree_matrix[i].push_back(std::pair<unsigned int, short>(index, 1));
 					}
 					else
-					{
-						double value = dist_pos_neg(generator);
-						std::stringstream ss;
-						ss << value;
-						tree_matrix[i].push_back(ss.str());
-					}
+						tree_matrix[i].push_back(std::pair<unsigned int, short>(0, 2));
 				}
 			}
 			nodes_level = next_level;
@@ -205,45 +196,30 @@ Individual* Individual::build_random_individual(unsigned int max_height, bool fu
 		unsigned int cur_index = 0;
 		for (unsigned int j = 0; j < tree_matrix[i].size(); ++j)
 		{
-			bool isOperator = false;
-			for (unsigned int k = 0; k < operators.size(); ++k)
-			{
-				if (operators[k] == tree_matrix[i][j])
-					isOperator = true;
-			}
-			if (isOperator)
+			if (tree_matrix[i][j].second == 0)
 			{
 				std::vector<double> v1 = roots[cur_index]->get_values();
 				std::vector<double> v2 = roots[cur_index + 1]->get_values();
 				for (double v : v2)
 					v1.push_back(v);
-				Individual* temp = new Individual(roots[cur_index]->index(), tree_matrix[i][j], 
+				Individual* temp = new Individual(roots[cur_index]->index(), operators[tree_matrix[i][j].first], 
 					roots[cur_index + 1]->index(), &graph, v1);
 				new_roots.push_back(temp);
 				cur_index += 2;
 			}
+			else if (tree_matrix[i][j].second == 1)
+			{
+				std::vector<double> values;
+				unsigned int index_vertex = graph.exists(terminals[tree_matrix[i][j].first]);
+				if (index_vertex == UINT_MAX)
+					index_vertex = graph.add_vertex(new VariableVertex(terminals[tree_matrix[i][j].first]));
+				new_roots.push_back(new Individual(index_vertex, &graph, values));
+			}
 			else
 			{
-				bool is_terminal = false;
-				for (unsigned int k = 0; k < terminals.size(); ++k)
-				{
-					if (tree_matrix[i][j] == terminals[k])
-						is_terminal = true;
-				}
-				if (is_terminal)
-				{
-					std::vector<double> values;
-					unsigned int index_vertex = graph.exists(tree_matrix[i][j]);
-					if (index_vertex == UINT_MAX)
-						index_vertex = graph.add_vertex(new VariableVertex(tree_matrix[i][j]));
-					new_roots.push_back(new Individual(index_vertex, &graph, values));
-				}
-				else
-				{
-					std::vector<double> values;
-					values.push_back(atof(tree_matrix[i][j].data()));
-					new_roots.push_back(new Individual(0, &graph, values));
-				}
+				std::vector<double> values;
+				values.push_back(dist_pos_neg(generator));
+				new_roots.push_back(new Individual(0, &graph, values));
 			}
 		}
 		

@@ -28,10 +28,14 @@ public:
 		vertex = NULL;
 	}
 
-	inline const std::vector<double> evaluate(const Dataset& dataset, unsigned int dataset_id) const
+	inline const std::vector<double>& evaluate(const Dataset& dataset, unsigned int dataset_id)
 	{
-		unsigned int count = 0;
-		return digraph->evaluate(index_vertex, dataset, dataset_id, values, count);
+		if (fitted[dataset_id].size() == 0)
+		{
+			unsigned int count = 0;
+			fitted[dataset_id] = digraph->evaluate(index_vertex, dataset, values, count);
+		}
+		return fitted[dataset_id];
 	}
 
 	Individual* random_subexpression(std::mt19937& generator);
@@ -76,6 +80,7 @@ public:
 private:
 	unsigned int index_vertex;
 	std::vector<double> values;
+	std::map< unsigned int, std::vector<double> > fitted;
 	Vertex* vertex;
 	Digraph* digraph;
 
